@@ -1,6 +1,8 @@
 package com.usertasks.tasks.Users;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -22,11 +24,17 @@ public class UserService {
 
     //GET /user/{id}
     @GetMapping(path = "users/{id}")
-    public User getUser(@PathVariable int id) {
+    public EntityModel<User> getUser(@PathVariable int id) {
         User user = userDAO.getUserById(id);
         if(user == null)
             throw new UserNotFoundException("invalid user " + id);
-        return user;
+
+        EntityModel<User> resource = EntityModel.of(user);
+        WebMvcLinkBuilder linkTo = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder
+                        .methodOn(this.getClass())
+                        .getAllUsers());
+        resource.add(linkTo.withRel("all-users"));
+        return resource;
     }
 
     //POST /users/{user}
