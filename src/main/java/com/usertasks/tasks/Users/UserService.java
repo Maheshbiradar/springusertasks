@@ -39,4 +39,12 @@ public class UserService {
                 .toUri();
         return ResponseEntity.created(location).build();
     }
+
+    //DELETE /user/{id}
+    @DeleteMapping(path = "users/{id}")
+    public void deleteUserById(@PathVariable int id) {
+        User user = userDAO.deleteUserById(id);
+        if(user == null)
+            throw new UserNotFoundException("invalid user " + id);
+        }
 }
